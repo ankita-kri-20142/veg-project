@@ -1,0 +1,58 @@
+<resources>
+
+    <!-- Base application theme -->
+    <style name="AppTheme.MinuteBazar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primaryGreen</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkGreen</item>
+        <item name="colorSecondary">@color/accentYellow</item>
+        <item name="android:statusBarColor">@color/primaryDarkGreen</item>
+        <item name="android:navigationBarColor">@color/primaryDarkGreen</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+    </style>
+
+    <!-- Splash screen theme -->
+    <style name="AppTheme.MinuteBazar.Splash" parent="AppTheme.MinuteBazar">
+        <item name="android:windowBackground">@color/primaryGreen</item>
+    </style>
+
+    <!-- Custom TextInputLayout style -->
+    <style name="Widget.MinuteBazarApp.TextInput" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@color/backgroundColor</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="android:textColorHint">@color/textColorSecondary</item>
+        <item name="hintTextAppearance">@style/TextAppearance.MinuteBazarApp.Hint</item>
+    </style>
+
+    <!-- Text appearance for input hints -->
+    <style name="TextAppearance.MinuteBazarApp.Hint" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/textColorSecondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Custom Button style -->
+    <style name="Widget.MinuteBazarApp.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/primaryGreen</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- Additional Rounded Button Style -->
+    <style name="Widget.MinuteBazarApp.ButtonRound" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/minute_bazar_green</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="cornerRadius">24dp</item>
+    </style>
+
+    <style name="Widget.MinuteBazar.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">@color/minute_bazar_green</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
+</resources>
