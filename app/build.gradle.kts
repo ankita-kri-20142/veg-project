@@ -75,4 +75,5 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
+    implementation("androidx.navigation:navigation-compose:2.7.0")
 }
