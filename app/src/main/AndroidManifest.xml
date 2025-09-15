@@ -4,33 +4,22 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/logo_minute_bazar"
+        android:icon="@drawable/minutebazarlogo"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/logo_minute_bazar"
+        android:roundIcon="@drawable/minutebazarlogo"
         android:supportsRtl="true"
         android:theme="@style/Theme.MinuteBazar">
 
-        <!-- Splash Activity as LAUNCHER -->
+        <!-- MainActivity as the single LAUNCHER Activity -->
         <activity
-            android:name="com.example.minutebazar.ui.SplashActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MinuteBazar.Splash">
+            android:theme="@style/Theme.MinuteBazar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Main Activity -->
-        <activity
-            android:name="com.example.minutebazar.ui.MainActivity"
-            android:exported="true" />
-
-        <!-- OTP Activity -->
-        <activity
-            android:name="com.example.minutebazar.ui.OtpActivity"
-            android:exported="true" />
-
 
     </application>
 </manifest>

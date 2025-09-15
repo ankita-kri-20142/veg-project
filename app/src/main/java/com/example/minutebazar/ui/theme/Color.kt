@@ -1,10 +1,11 @@
-package com.example.minutebazar.ui.theme
+package com.minutebazar.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryGreen = Color(0xFF68BC6F)       // Splash BG from your image
-val SplashYellow = Color(0xFFFFA726)       // Cart + MINUTE orange-yellow
-val SplashBazarGreen = Color(0xFF219653)   // BAZAR text
-val White = Color(0xFFFFFFFF)
-val BlackText = Color(0xFF212121)
-val GrayText = Color(0xFF757575)
+val GreenPrimary = Color(0xFF63C47F)
+val YellowAccent = Color(0xFFFFDC4B)
+val Background = Color(0xFFF7F7F7)
+val SurfaceWhite = Color(0xFFFFFFFF)
+val TextBlack = Color(0xFF232323)
+val TextGray = Color(0xFF757575)
+val DividerGray = Color(0xFFD9D9D9)
