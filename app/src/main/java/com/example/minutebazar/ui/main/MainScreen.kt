@@ -30,6 +30,8 @@ fun MainScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    var showAccountDialog by remember { mutableStateOf(false) }
+
     val filteredProducts = vegetables.filter { it.name.contains(searchQuery, true) }
     val cartAmount = cartProducts.entries.sumOf { (product, qty) -> product.price * qty }
     val cartItemCount = cartProducts.values.sum()
@@ -41,7 +43,7 @@ fun MainScreen(navController: NavController) {
             Column {
                 if (showProceedBar) {
                     ProceedBar(cartAmount, cartItemCount) {
-                        navController.navigate("cart")
+                        showAccountDialog = true
                     }
                 }
                 NavigationBar {
@@ -71,7 +73,7 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFFF6FFF6)) // subtle green background
+                .background(Color(0xFFF6FFF6))
         ) {
             Spacer(Modifier.height(16.dp))
             BasicTextField(
@@ -95,7 +97,7 @@ fun MainScreen(navController: NavController) {
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFFFCC00)) // cashback banner color
+                    .background(Color(0xFFFFCC00))
                     .padding(vertical = 12.dp, horizontal = 8.dp)
             ) {
                 Text(
@@ -129,6 +131,20 @@ fun MainScreen(navController: NavController) {
                 }
             }
         }
+
+        if (showAccountDialog) {
+            AccountCheckDialog(
+                onHaveAccount = {
+                    showAccountDialog = false
+                    navController.navigate("login")
+                },
+                onNoAccount = {
+                    showAccountDialog = false
+                    navController.navigate("register")
+                },
+                onDismiss = { showAccountDialog = false }
+            )
+        }
     }
 }
 
@@ -152,4 +168,26 @@ fun ProceedBar(amount: Int, itemCount: Int, onProceed: () -> Unit) {
             Text("Proceed", color = Color.Black, style = MaterialTheme.typography.titleMedium)
         }
     }
+}
+
+@Composable
+fun AccountCheckDialog(
+    onHaveAccount: () -> Unit,
+    onNoAccount: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Do you have an account?") },
+        confirmButton = {
+            TextButton(onClick = onHaveAccount) {
+                Text("Yes")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onNoAccount) {
+                Text("No")
+            }
+        }
+    )
 }
