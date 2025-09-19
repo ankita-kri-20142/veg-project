@@ -76,6 +76,11 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
     implementation("androidx.navigation:navigation-compose:2.7.0")
+<<<<<<< HEAD
     implementation("androidx.compose.material:material-icons-extended:1.4.0")
 // or matching your Compose version
+=======
+
+
+>>>>>>> 1583caf9661a19b020642e518f4d310d0451d0c6
 }
