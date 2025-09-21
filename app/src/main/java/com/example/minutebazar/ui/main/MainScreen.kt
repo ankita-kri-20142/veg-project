@@ -6,36 +6,43 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
+import com.example.minutebazar.ui.cart.CartScreen
 import kotlinx.coroutines.launch
+import com.example.minutebazar.ui.main.ProductListItem
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(
+    navController: NavHostController,
+    cartProducts: MutableMap<Product, Int>    // Accept shared cart state as parameter
+) {
     var searchQuery by remember { mutableStateOf("") }
-    val cartProducts = remember { mutableStateMapOf<Product, Int>() }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     var showAccountDialog by remember { mutableStateOf(false) }
 
-    val filteredProducts = vegetables.filter { it.name.contains(searchQuery, true) }
+    val filteredProducts = vegetables.filter { it.name.contains(searchQuery, ignoreCase = true) }
     val cartAmount = cartProducts.entries.sumOf { (product, qty) -> product.price * qty }
     val cartItemCount = cartProducts.values.sum()
     val showProceedBar = cartProducts.isNotEmpty()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -48,29 +55,51 @@ fun MainScreen(navController: NavController) {
                 }
                 NavigationBar {
                     NavigationBarItem(
-                        selected = true,
+                        selected = currentRoute == "home",
                         icon = { Icon(Icons.Default.Home, contentDescription = null) },
                         label = { Text("Home") },
-                        onClick = {}
+                        onClick = {
+                            if (currentRoute != "home") {
+                                navController.navigate("home") {
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
                     )
                     NavigationBarItem(
-                        selected = false,
+                        selected = currentRoute == "cart",
                         icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
                         label = { Text("Cart") },
-                        onClick = { navController.navigate("cart") }
+                        onClick = {
+                            if (currentRoute != "cart") {
+                                navController.navigate("cart") { launchSingleTop = true }
+                            }
+                        }
                     )
                     NavigationBarItem(
-                        selected = false,
+                        selected = currentRoute == "profile",
                         icon = { Icon(Icons.Default.Person, contentDescription = null) },
                         label = { Text("Profile") },
-                        onClick = {}
+                        onClick = {
+                            if (currentRoute != "profile") {
+                                navController.navigate("profile") {
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
                     )
+
+
                 }
             }
         }
     ) { padding ->
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .background(Color(0xFFF6FFF6))
@@ -88,7 +117,10 @@ fun MainScreen(navController: NavController) {
                             .height(48.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        if (searchQuery.isEmpty()) Text("Search for...", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                        if (searchQuery.isEmpty()) Text(
+                            "Search for...",
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        )
                         innerTextField()
                     }
                 }
@@ -124,8 +156,11 @@ fun MainScreen(navController: NavController) {
                             scope.launch { snackbarHostState.showSnackbar("Added to cart") }
                         },
                         onRemove = {
-                            if (quantity > 0) cartProducts[product] = quantity - 1
-                            if (cartProducts[product] == 0) cartProducts.remove(product)
+                            if (quantity > 0) {
+                                val newQty = quantity - 1
+                                if (newQty == 0) cartProducts.remove(product)
+                                else cartProducts[product] = newQty
+                            }
                         }
                     )
                 }
@@ -144,28 +179,6 @@ fun MainScreen(navController: NavController) {
                 },
                 onDismiss = { showAccountDialog = false }
             )
-        }
-    }
-}
-
-@Composable
-fun ProceedBar(amount: Int, itemCount: Int, onProceed: () -> Unit) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(vertical = 12.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null, tint = Color(0xFF2C2C2C))
-        Spacer(Modifier.width(10.dp))
-        Text("₹$amount  ·  $itemCount item", style = MaterialTheme.typography.bodyLarge)
-        Spacer(Modifier.weight(1f))
-        Button(
-            onClick = onProceed,
-            colors = ButtonDefaults.buttonColors(Color(0xFFFFD600))
-        ) {
-            Text("Proceed", color = Color.Black, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -190,4 +203,44 @@ fun AccountCheckDialog(
             }
         }
     )
+}
+
+@Composable
+fun ProceedBar(amount: Int, itemCount: Int, onProceed: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = Color(0xFF2C2C2C))
+        Spacer(Modifier.width(10.dp))
+        Text("₹$amount  ·  $itemCount item", style = MaterialTheme.typography.bodyLarge)
+        Spacer(Modifier.weight(1f))
+        Button(
+            onClick = onProceed,
+            colors = ButtonDefaults.buttonColors(Color(0xFFFFD600))
+        ) {
+            Text("Proceed", color = Color.Black, style = MaterialTheme.typography.titleMedium)
+        }
+    }
+}
+
+@Composable
+fun AppNavGraph() {
+    val navController = rememberNavController()
+    val cartProducts = remember { mutableStateMapOf<Product, Int>() }
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            MainScreen(navController = navController, cartProducts = cartProducts)
+        }
+        composable("cart") {
+            CartScreen(navController = navController, cartProducts = cartProducts)
+        }
+        composable("profile") {
+            MinuteBazarProfileScreen(navController)  // Pass navController here
+        }
+    }
 }

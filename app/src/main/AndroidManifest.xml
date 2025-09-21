@@ -4,17 +4,16 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/minutebazarlogo"
-        android:label="@string/app_name"
-        android:roundIcon="@drawable/minutebazarlogo"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:label="Minute Bazar"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MinuteBazar">
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <!-- MainActivity as the single LAUNCHER Activity -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MinuteBazar">
+            android:theme="@android:style/Theme.Material.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

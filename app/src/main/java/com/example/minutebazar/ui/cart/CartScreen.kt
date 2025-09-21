@@ -1,9 +1,11 @@
 package com.example.minutebazar.ui.cart
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
@@ -14,38 +16,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.compose.foundation.border
+import androidx.navigation.NavHostController
+import com.example.minutebazar.ui.main.Product
+import androidx.compose.material3.ExperimentalMaterial3Api
 
-
-data class CartItem(val name: String, var price: Int, var quantity: Int)
+@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun CartScreen(navController: NavController) {
-    // Delivery slots
+fun CartScreen(
+    navController: NavHostController,
+    cartProducts: MutableMap<Product, Int>
+) {
     val deliverySlots = listOf("5 AM - 7 AM", "7 AM - 9 AM", "9 AM - 11 AM", "11 AM - 1 PM")
     var selectedSlot by remember { mutableStateOf(0) }
 
-    // Cart items (as state)
     val deliveryThreshold = 219
-    val initialCart = remember {
-        mutableStateListOf(
-            CartItem("Fresh Onion 1kg", 30, 1)
-            // Add more items as needed
-        )
-    }
-
-    val itemTotal = initialCart.sumOf { it.price * it.quantity }
+    val itemTotal = cartProducts.entries.sumOf { (product, qty) -> product.price * qty }
     val deliveryShortAmount = (if (itemTotal < deliveryThreshold) deliveryThreshold - itemTotal else 0)
 
     Column(
-        modifier = Modifier
+        Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Delivery slots
+        TopAppBar(
+            title = { Text("Cart") },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(Icons.Filled.ArrowBack, "Back")
+                }
+            },
+            colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.White)
+        )
+        Spacer(Modifier.height(16.dp))
         Text("SELECT DELIVERY SLOT", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(8.dp))
+
         Row {
             deliverySlots.forEachIndexed { idx, slot ->
                 val selected = idx == selectedSlot
@@ -62,7 +68,7 @@ fun CartScreen(navController: NavController) {
                         .border(2.dp, borderColor, RoundedCornerShape(8.dp))
                 ) {
                     Text(
-                        text = "Tomorrow\n$slot",
+                        "Tomorrow\n$slot",
                         color = if (selected) Color(0xFF00834C) else Color.Black,
                         fontSize = 13.sp,
                         fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
@@ -70,45 +76,41 @@ fun CartScreen(navController: NavController) {
                 }
             }
         }
-
         Spacer(Modifier.height(20.dp))
 
-        // Cart Items section
-        initialCart.forEach { item ->
+        cartProducts.forEach { (product, quantity) ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
             ) {
-                Text(item.name, modifier = Modifier.weight(1f), fontSize = 15.sp)
+                Text(product.name, Modifier.weight(1f), fontSize = 15.sp)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
-                        onClick = { if (item.quantity > 1) item.quantity-- },
-                        enabled = item.quantity > 1
+                        onClick = { if (quantity > 1) cartProducts[product] = quantity - 1 },
+                        enabled = quantity > 1
                     ) {
-                        Icon(Icons.Filled.Remove, contentDescription = "Remove")
+                        Icon(Icons.Filled.Remove, "Remove")
                     }
-                    Text(item.quantity.toString(), modifier = Modifier.width(24.dp), fontSize = 15.sp)
-                    IconButton(
-                        onClick = { item.quantity++ }
-                    ) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add")
+                    Text(quantity.toString(), Modifier.width(24.dp), fontSize = 15.sp)
+                    IconButton(onClick = { cartProducts[product] = quantity + 1 }) {
+                        Icon(Icons.Filled.Add, "Add")
                     }
                 }
                 Spacer(Modifier.width(10.dp))
-                Text("₹${item.price * item.quantity}", fontWeight = FontWeight.SemiBold)
+                Text("₹${product.price * quantity}", fontWeight = FontWeight.SemiBold)
             }
         }
 
         if (deliveryShortAmount > 0) {
             Card(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F8E9)),
             ) {
                 Text(
                     "Add items worth ₹$deliveryShortAmount more for Free delivery",
-                    modifier = Modifier.padding(12.dp),
+                    Modifier.padding(12.dp),
                     fontSize = 14.sp,
                     color = Color(0xFF388E3C)
                 )
@@ -120,8 +122,8 @@ fun CartScreen(navController: NavController) {
         Divider()
         Spacer(Modifier.height(8.dp))
 
-        // Total and action button
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -133,7 +135,7 @@ fun CartScreen(navController: NavController) {
 
         Button(
             onClick = { navController.navigate("checkout") },
-            modifier = Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             enabled = itemTotal > 0
         ) {
             Text(if (itemTotal > 0) "Proceed to pay" else "Add items to continue")
