@@ -29,7 +29,7 @@ fun SplashScreen(navController: NavController) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(id = R.drawable.minutebazarlogo), // Place your logo in drawable as ic_logo
+                painter = painterResource(id = R.drawable.applogo), // Place your logo in drawable as ic_logo
                 contentDescription = "Logo",
                 modifier = Modifier.size(120.dp)
             )
