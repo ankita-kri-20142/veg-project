@@ -5,97 +5,106 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.*
+import java.util.concurrent.TimeUnit
 
 
 @Composable
-fun LoginScreen(navController: NavController) {
-    var loginByPhone by remember { mutableStateOf(true) }
+fun LoginScreen(navController: NavController, firebaseAuth: FirebaseAuth) {
     var phone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+
+    fun sendVerificationCode(phoneNumber: String, onCodeSent: (String) -> Unit) {
+        isLoading = true
+        errorMessage = null
+
+        val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+            override fun onCodeSent(vid: String, token: PhoneAuthProvider.ForceResendingToken) {
+                isLoading = false
+                onCodeSent(vid)
+            }
+
+            override fun onVerificationFailed(e: FirebaseException) {
+                isLoading = false
+                errorMessage = e.localizedMessage
+            }
+
+            override fun onVerificationCompleted(credential: PhoneAuthCredential) {}
+        }
+
+        val options = PhoneAuthOptions.newBuilder(firebaseAuth)
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(60L, TimeUnit.SECONDS)
+            .setActivity(context as android.app.Activity)
+            .setCallbacks(callbacks)
+            .build()
+
+        PhoneAuthProvider.verifyPhoneNumber(options)
+    }
 
     Column(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        Modifier.fillMaxSize().padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(24.dp))
+        Text("Sign In", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(16.dp))
 
-        Text(
-            "Great deals on your first purchase",
-            style = MaterialTheme.typography.titleMedium
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Enter Phone Number (+CountryCode)") },
+            placeholder = { Text("+911234567890") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))
 
-        // Toggle group for login type
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+        Button(
+            onClick = {
+                if (phone.isNotBlank()) {
+                    sendVerificationCode(phone) { vid ->
+                        // Fixed error: use 'vid' instead of undefined 'verificationId'
+                        navController.navigate("otp_screen/$phone/$vid")
+                    }
+                } else {
+                    errorMessage = "Please enter your phone number"
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Button(
-                onClick = { loginByPhone = true },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (loginByPhone) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Text("Phone")
-            }
-            Spacer(Modifier.width(16.dp))
-            Button(
-                onClick = { loginByPhone = false },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (!loginByPhone) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Text("Email")
-            }
-        }
-        Spacer(Modifier.height(16.dp))
-
-        if (loginByPhone) {
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Enter your phone number") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else {
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Enter your email") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Enter your password") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = true, onCheckedChange = {})
-            Text("By continuing, you agree to Minute Bazar's privacy and policy")
+            Text("Sign In")
         }
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate("otp") },
+            onClick = { navController.navigate("register") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = if (loginByPhone) phone.isNotBlank() else email.isNotBlank() && password.isNotBlank()
+            enabled = !isLoading
         ) {
-            Text("Login using OTP")
+            Text("Sign Up")
+        }
+
+        errorMessage?.let {
+            Spacer(Modifier.height(16.dp))
+            Text(it, color = MaterialTheme.colorScheme.error)
+        }
+
+        if (isLoading) {
+            Spacer(Modifier.height(16.dp))
+            CircularProgressIndicator()
         }
     }
 }

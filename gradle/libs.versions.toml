@@ -1,6 +1,9 @@
 [versions]
 kotlin = "1.9.0"
 compose = "1.5.0"
+firebaseAuthKtx = "24.0.1"
+firebaseCommonKtx = "22.0.1"
+playServicesBasement = "18.8.0"
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.0.2" }
@@ -18,3 +21,6 @@ androidx-compose-material3 = { module = "androidx.compose.material3:material3", 
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.7.2" }
 org-jetbrains-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }

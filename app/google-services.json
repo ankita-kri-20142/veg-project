@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1051194092153",
+    "project_id": "minutebazar-e5762",
+    "storage_bucket": "minutebazar-e5762.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051194092153:android:0f74a5f4659a79737102a8",
+        "android_client_info": {
+          "package_name": "com.example.minutebazar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQgRlHMdb76gExBPz4rER7PhZQKStcvNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

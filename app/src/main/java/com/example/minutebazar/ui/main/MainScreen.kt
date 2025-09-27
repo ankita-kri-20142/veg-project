@@ -14,11 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import com.example.minutebazar.R
 import com.example.minutebazar.ui.cart.CartScreen
 import kotlinx.coroutines.launch
 import com.example.minutebazar.ui.main.ProductListItem
@@ -92,8 +94,6 @@ fun MainScreen(
                             }
                         }
                     )
-
-
                 }
             }
         }
@@ -105,26 +105,45 @@ fun MainScreen(
                 .background(Color(0xFFF6FFF6))
         ) {
             Spacer(Modifier.height(16.dp))
-            BasicTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                decorationBox = { innerTextField ->
-                    Box(
-                        Modifier
-                            .padding(horizontal = 16.dp)
-                            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.small)
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (searchQuery.isEmpty()) Text(
-                            "Search for...",
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                        )
-                        innerTextField()
-                    }
-                }
-            )
+            // Add this Row to show app logo and search bar side by side
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp) // adjust spacing as needed
+            ) {
+                // Replace "applogo" with your drawable resource name
+                Icon(
+                    painter = painterResource(id = R.drawable.applogo),
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(40.dp),
+                    tint = Color.Unspecified
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                BasicTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    decorationBox = { innerTextField ->
+                        Box(
+                            Modifier
+                                // Removed conflicting padding here, use only padding in Row above if needed
+                                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.small)
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (searchQuery.isEmpty()) Text(
+                                "Search for...",
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            )
+                            innerTextField()
+                        }
+                    },
+                    modifier = Modifier.weight(1f)  // Make search bar take remaining width within row
+                )
+            }
             Spacer(Modifier.height(12.dp))
             Box(
                 Modifier
